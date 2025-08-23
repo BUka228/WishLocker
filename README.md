@@ -31,25 +31,24 @@ wish-bank/
 ### Предварительные требования
 
 - Node.js 18+
-- npm или yarn
-- Supabase CLI
+- npm
+- Docker (для Supabase)
 
 ### Установка
 
-1. Установите зависимости:
+1. Клонируйте репозиторий и установите зависимости:
 ```bash
 npm run install:all
 ```
 
-2. Скопируйте файл окружения:
+2. Запустите Supabase локально:
 ```bash
-cp frontend/.env.example frontend/.env.local
+npm run backend:start
 ```
 
-3. Запустите Supabase локально:
+3. Проверьте настройку:
 ```bash
-cd backend
-npm run start
+npm run verify
 ```
 
 4. Запустите фронтенд:
@@ -59,12 +58,32 @@ npm run dev
 
 Приложение будет доступно по адресу: http://localhost:3000
 
+### Автоматическая настройка
+
+Для полностью автоматической настройки используйте:
+```bash
+npm run setup
+```
+
 ## Команды разработки
 
+### Основные команды
 - `npm run dev` - Запуск фронтенда в режиме разработки
 - `npm run build` - Сборка продакшн версии
+- `npm run setup` - Автоматическая настройка проекта
+- `npm run verify` - Проверка корректности настройки
+
+### Backend команды
 - `npm run backend:start` - Запуск Supabase локально
+- `npm run backend:stop` - Остановка Supabase
 - `npm run backend:reset` - Сброс локальной БД с применением миграций
+- `npm run backend:status` - Статус Supabase сервисов
+- `npm run backend:generate-types` - Генерация TypeScript типов из БД
+
+### Полезные ссылки
+- Frontend: http://localhost:3000
+- Supabase Studio: http://localhost:54323
+- Supabase API: http://localhost:54321
 
 ## Валютная система
 

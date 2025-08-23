@@ -15,10 +15,20 @@
     "backend:stop": "npm run stop --workspace=backend",
     "backend:reset": "npm run reset --workspace=backend",
     "backend:status": "npm run status --workspace=backend",
+    "backend:generate-types": "npm run generate-types --workspace=backend",
     "install:all": "npm install && npm install --workspace=frontend && npm install --workspace=backend",
-    "setup": "node scripts/setup.js"
+    "setup": "node scripts/setup.js",
+    "verify": "node scripts/verify-setup.js"
   },
-  "keywords": ["wishes", "gamification", "supabase", "nextjs"],
+  "keywords": [
+    "wishes",
+    "gamification",
+    "supabase",
+    "nextjs"
+  ],
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "supabase": "^2.34.3"
+  }
 }

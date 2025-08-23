@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "Supabase backend for Wish Bank application",
   "scripts": {
-    "start": "supabase start",
-    "stop": "supabase stop",
-    "reset": "supabase db reset",
-    "migrate": "supabase db push",
-    "generate-types": "supabase gen types typescript --local > ../shared/supabase-types.ts",
-    "seed": "supabase db reset --with-seed",
-    "status": "supabase status",
-    "logs": "supabase logs"
+    "start": "npx supabase start",
+    "stop": "npx supabase stop",
+    "reset": "npx supabase db reset",
+    "migrate": "npx supabase db push",
+    "generate-types": "npx supabase gen types typescript --local > ../shared/supabase-types.ts",
+    "seed": "npx supabase db reset --with-seed",
+    "status": "npx supabase status",
+    "logs": "npx supabase logs"
   },
   "devDependencies": {
     "supabase": "^1.120.0"
