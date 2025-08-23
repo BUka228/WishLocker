@@ -5,6 +5,7 @@ export interface AuthUser extends User {
   username?: string
 }
 
+// Legacy auth utilities - use AuthContext for new code
 export const auth = {
   // Sign up new user
   async signUp(email: string, password: string, username: string) {
@@ -52,4 +53,29 @@ export const auth = {
       callback(session?.user as AuthUser || null)
     })
   },
+
+  // Validate username format
+  validateUsername(username: string): { valid: boolean; error?: string } {
+    if (!username || username.length < 3 || username.length > 20) {
+      return { valid: false, error: 'Имя пользователя должно содержать от 3 до 20 символов' }
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_-]+$/
+    if (!usernameRegex.test(username)) {
+      return { valid: false, error: 'Имя пользователя может содержать только буквы, цифры, дефисы и подчеркивания' }
+    }
+
+    return { valid: true }
+  },
+
+  // Check if username is available
+  async isUsernameAvailable(username: string): Promise<boolean> {
+    const { data } = await supabase
+      .from('users')
+      .select('username')
+      .eq('username', username)
+      .single()
+
+    return !data
+  }
 }
