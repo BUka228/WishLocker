@@ -1,0 +1,18 @@
+{
+  "name": "wish-bank-backend",
+  "version": "1.0.0",
+  "description": "Supabase backend for Wish Bank application",
+  "scripts": {
+    "start": "supabase start",
+    "stop": "supabase stop",
+    "reset": "supabase db reset",
+    "migrate": "supabase db push",
+    "generate-types": "supabase gen types typescript --local > ../shared/supabase-types.ts",
+    "seed": "supabase db reset --with-seed",
+    "status": "supabase status",
+    "logs": "supabase logs"
+  },
+  "devDependencies": {
+    "supabase": "^1.120.0"
+  }
+}

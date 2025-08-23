@@ -1,0 +1,24 @@
+{
+  "name": "wish-bank",
+  "version": "1.0.0",
+  "description": "Система управления желаниями с трехуровневой валютной системой",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend",
+    "start": "npm run start --workspace=frontend",
+    "backend:start": "npm run start --workspace=backend",
+    "backend:stop": "npm run stop --workspace=backend",
+    "backend:reset": "npm run reset --workspace=backend",
+    "backend:status": "npm run status --workspace=backend",
+    "install:all": "npm install && npm install --workspace=frontend && npm install --workspace=backend",
+    "setup": "node scripts/setup.js"
+  },
+  "keywords": ["wishes", "gamification", "supabase", "nextjs"],
+  "author": "Your Name",
+  "license": "MIT"
+}
