@@ -108,7 +108,7 @@ export function WishDisputes({ wishId, isCreator }: WishDisputesProps) {
             <div className="flex items-center gap-2">
               <User className="w-4 h-4 text-gray-400" />
               <span className="font-medium text-gray-900">
-                {dispute.disputer_username || 'Пользователь'}
+                {dispute.disputer?.username || 'Пользователь'}
               </span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(dispute.status)}`}>
                 {DISPUTE_STATUS_METADATA[dispute.status]?.name || dispute.status}

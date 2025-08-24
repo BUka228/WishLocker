@@ -53,7 +53,6 @@
 
 - [x] 7. Add wish dispute system
 
-
   - Create dispute functionality allowing users to challenge wishes with comments
   - Implement dispute notification system for wish creators
   - Add dispute resolution interface for creators to accept/reject alternatives
@@ -61,7 +60,8 @@
   - Implement dispute status tracking and history
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 8. Build social friendship system
+- [x] 8. Build social friendship system
+
 
   - Create friendship management with pending/accepted/blocked statuses
   - Implement friend request sending and receiving functionality

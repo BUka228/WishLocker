@@ -80,10 +80,10 @@ export function DisputesList({
           {showWishTitle && (
             <div className="mb-2">
               <h3 className="font-medium text-gray-900">
-                {dispute.wish_title || 'Желание'}
+                {dispute.wish?.title || 'Желание'}
               </h3>
               <p className="text-sm text-gray-600">
-                Создатель: {dispute.wish_creator_username || 'Неизвестно'}
+                Создатель: {dispute.wish?.creator?.username || 'Неизвестно'}
               </p>
             </div>
           )}
@@ -92,7 +92,7 @@ export function DisputesList({
           {!showWishTitle && (
             <div className="mb-2">
               <p className="text-sm text-gray-600">
-                Спор от: {dispute.disputer_username || 'Пользователь'}
+                Спор от: {dispute.disputer?.username || 'Пользователь'}
               </p>
             </div>
           )}

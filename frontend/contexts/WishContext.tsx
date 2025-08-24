@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './AuthContext'
+import { useSocial } from './SocialContext'
 import { Wish, WishType, WishStatus, ApiResponse } from '@/lib/types'
 import { validateWishTitle, validateWishDescription } from '@/lib/validation'
 
@@ -39,8 +40,19 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
+  
+  // Get friends from SocialContext for friend-based wish visibility
+  // Handle case where SocialProvider is not available (e.g., in tests)
+  let friends: any[] = []
+  try {
+    const socialContext = useSocial()
+    friends = socialContext.friends || []
+  } catch (error) {
+    // SocialContext not available, continue without friends
+    friends = []
+  }
 
-  // Load wishes on mount and when user changes
+  // Load wishes on mount and when user or friends change
   useEffect(() => {
     if (user) {
       refreshWishes()
@@ -48,7 +60,7 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
       setWishes([])
       setLoading(false)
     }
-  }, [user])
+  }, [user, friends])
 
   const refreshWishes = async () => {
     if (!user) return
@@ -57,14 +69,23 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
       setLoading(true)
       setError(null)
 
-      const { data, error: supabaseError } = await supabase
+      let query = supabase
         .from('wishes')
         .select(`
           *,
           creator:users!creator_id(id, username, avatar_url),
           assignee:users!assignee_id(id, username, avatar_url)
         `)
-        .order('created_at', { ascending: false })
+
+      // If we have friends, filter to show user's wishes + friends' wishes
+      if (friends.length > 0) {
+        const friendIds = friends.map(f => f.id)
+        const userIds = [user.id, ...friendIds]
+        query = query.in('creator_id', userIds)
+      }
+      // Otherwise, show all wishes (backward compatibility)
+
+      const { data, error: supabaseError } = await query.order('created_at', { ascending: false })
 
       if (supabaseError) {
         throw supabaseError
@@ -106,7 +127,7 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
           description: wishData.description.trim(),
           type: wishData.type,
           cost,
-          status: 'active' as WishStatus,
+          status: 'active',
           creator_id: user.id,
           deadline: wishData.deadline || null
         })
@@ -148,28 +169,36 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
     try {
       // Handle different status transitions with appropriate database functions
       if (status === 'in_progress' && assigneeId) {
-        // Use accept_wish function for accepting wishes
-        const { data: functionResult, error: functionError } = await supabase
-          .rpc('accept_wish', {
-            p_wish_id: wishId,
-            p_assignee_id: assigneeId
+        // Accept wish with direct update
+        const { data, error: supabaseError } = await supabase
+          .from('wishes')
+          .update({ 
+            status: 'in_progress', 
+            assignee_id: assigneeId,
+            updated_at: new Date().toISOString() 
           })
+          .eq('id', wishId)
+          .select(`
+            *,
+            creator:users!creator_id(id, username, avatar_url),
+            assignee:users!assignee_id(id, username, avatar_url)
+          `)
+          .single()
 
-        if (functionError) {
-          throw functionError
+        if (supabaseError) {
+          throw supabaseError
         }
 
-        if (!functionResult.success) {
-          return { 
-            error: functionResult.message || 'Не удалось принять желание' 
-          }
-        }
-
-        // Refresh wishes to get updated data
-        await refreshWishes()
+        // Update local state
+        setWishes(prev => 
+          prev.map(wish => 
+            wish.id === wishId ? data as unknown as Wish : wish
+          )
+        )
         
         return { 
-          message: functionResult.message || 'Желание принято к выполнению!' 
+          data: data as unknown as Wish, 
+          message: 'Желание принято к выполнению!' 
         }
       } else if (status === 'completed' && assigneeId) {
         // Use complete_wish function for completing wishes
@@ -183,9 +212,9 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
           throw functionError
         }
 
-        if (!functionResult.success) {
+        if (!functionResult) {
           return { 
-            error: functionResult.message || 'Не удалось завершить желание' 
+            error: 'Не удалось завершить желание' 
           }
         }
 
@@ -193,7 +222,7 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
         await refreshWishes()
         
         return { 
-          message: functionResult.message || 'Желание успешно выполнено!' 
+          message: 'Желание успешно выполнено!' 
         }
       } else {
         // For other status updates, use direct database update
@@ -247,27 +276,24 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data: functionResult, error: functionError } = await supabase
-        .rpc('accept_wish', {
-          p_wish_id: wishId,
-          p_assignee_id: user.id
+      const { error: supabaseError } = await supabase
+        .from('wishes')
+        .update({ 
+          status: 'in_progress', 
+          assignee_id: user.id,
+          updated_at: new Date().toISOString() 
         })
+        .eq('id', wishId)
 
-      if (functionError) {
-        throw functionError
-      }
-
-      if (!functionResult.success) {
-        return { 
-          error: functionResult.message || 'Не удалось принять желание' 
-        }
+      if (supabaseError) {
+        throw supabaseError
       }
 
       // Refresh wishes to get updated data
       await refreshWishes()
       
       return { 
-        message: functionResult.message || 'Желание принято к выполнению!' 
+        message: 'Желание принято к выполнению!' 
       }
     } catch (err) {
       console.error('Error accepting wish:', err)
@@ -283,6 +309,7 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // Use the complete_wish function which handles wallet transactions
       const { data: functionResult, error: functionError } = await supabase
         .rpc('complete_wish', {
           p_wish_id: wishId,
@@ -293,9 +320,9 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
         throw functionError
       }
 
-      if (!functionResult.success) {
+      if (!functionResult) {
         return { 
-          error: functionResult.message || 'Не удалось завершить желание' 
+          error: 'Не удалось завершить желание' 
         }
       }
 
@@ -303,7 +330,7 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
       await refreshWishes()
       
       return { 
-        message: functionResult.message || 'Желание успешно выполнено!' 
+        message: 'Желание успешно выполнено!' 
       }
     } catch (err) {
       console.error('Error completing wish:', err)

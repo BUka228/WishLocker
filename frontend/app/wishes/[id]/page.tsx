@@ -38,7 +38,7 @@ export default function WishDetailPage() {
   const canAccept = user && wish && wish.status === 'active' && wish.creator_id !== user.id
   const canComplete = user && wish && wish.status === 'in_progress' && wish.assignee_id === user.id
   const canDispute = user && wish && ['active', 'in_progress'].includes(wish.status) && wish.creator_id !== user.id
-  const isCreator = user && wish && wish.creator_id === user.id
+  const isCreator = !!(user && wish && wish.creator_id === user.id)
 
   const handleAccept = async () => {
     if (!user || !wish) return

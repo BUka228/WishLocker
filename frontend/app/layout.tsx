@@ -2,6 +2,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from '../contexts/AuthContext'
 import { WalletProvider } from '../contexts/WalletContext'
+import { SocialProvider } from '../contexts/SocialContext'
 import { WishProvider } from '../contexts/WishContext'
 import { DisputeProvider } from '../contexts/DisputeContext'
 import { ToastProvider } from '../components/ui/Toast'
@@ -24,13 +25,15 @@ export default function RootLayout({
         <ToastProvider>
           <AuthProvider>
             <WalletProvider>
-              <WishProvider>
-                <DisputeProvider>
-                  <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-                    {children}
-                  </div>
-                </DisputeProvider>
-              </WishProvider>
+              <SocialProvider>
+                <WishProvider>
+                  <DisputeProvider>
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+                      {children}
+                    </div>
+                  </DisputeProvider>
+                </WishProvider>
+              </SocialProvider>
             </WalletProvider>
           </AuthProvider>
         </ToastProvider>

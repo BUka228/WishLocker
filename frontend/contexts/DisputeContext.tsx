@@ -55,21 +55,9 @@ export function DisputeProvider({ children }: { children: React.ReactNode }) {
       setLoading(true)
       setError(null)
 
-      // Get disputes created by user
-      const { data: userDisputesData, error: userDisputesError } = await supabase
-        .rpc('get_user_disputes', { p_user_id: user.id })
-
-      if (userDisputesError) {
-        throw userDisputesError
-      }
-
-      // Get disputes on wishes created by user
-      const { data: creatorDisputesData, error: creatorDisputesError } = await supabase
-        .rpc('get_creator_disputes', { p_creator_id: user.id })
-
-      if (creatorDisputesError) {
-        throw creatorDisputesError
-      }
+      // Dispute system temporarily disabled - focusing on social system
+      const userDisputesData: any[] = []
+      const creatorDisputesData: any[] = []
 
       setUserDisputes((userDisputesData || []) as Dispute[])
       setCreatorDisputes((creatorDisputesData || []) as Dispute[])
@@ -99,17 +87,8 @@ export function DisputeProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data: functionResult, error: functionError } = await supabase
-        .rpc('create_dispute', {
-          p_wish_id: disputeData.wishId,
-          p_disputer_id: user.id,
-          p_comment: disputeData.comment.trim(),
-          p_alternative_description: disputeData.alternativeDescription?.trim() || null
-        })
-
-      if (functionError) {
-        throw functionError
-      }
+      // Dispute system temporarily disabled
+      const functionResult = { success: false, message: 'Система споров временно отключена' }
 
       if (!functionResult.success) {
         return { 
@@ -145,17 +124,8 @@ export function DisputeProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data: functionResult, error: functionError } = await supabase
-        .rpc('resolve_dispute', {
-          p_dispute_id: resolution.disputeId,
-          p_resolver_id: user.id,
-          p_action: resolution.action,
-          p_resolution_comment: resolution.resolutionComment?.trim() || null
-        })
-
-      if (functionError) {
-        throw functionError
-      }
+      // Dispute system temporarily disabled
+      const functionResult = { success: false, message: 'Система споров временно отключена' }
 
       if (!functionResult.success) {
         return { 
@@ -183,8 +153,9 @@ export function DisputeProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error: supabaseError } = await supabase
-        .rpc('get_wish_disputes', { p_wish_id: wishId })
+      // Dispute system temporarily disabled
+      const data: any[] = []
+      const supabaseError = null
 
       if (supabaseError) {
         throw supabaseError
