@@ -1,6 +1,8 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from '../contexts/AuthContext'
+import { WalletProvider } from '../contexts/WalletContext'
+import { WishProvider } from '../contexts/WishContext'
 import { ToastProvider } from '../components/ui/Toast'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
@@ -20,9 +22,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <ToastProvider>
           <AuthProvider>
-            <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-              {children}
-            </div>
+            <WalletProvider>
+              <WishProvider>
+                <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+                  {children}
+                </div>
+              </WishProvider>
+            </WalletProvider>
           </AuthProvider>
         </ToastProvider>
       </body>

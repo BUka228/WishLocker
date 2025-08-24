@@ -9,14 +9,14 @@
 
 - [x] 2. Implement core authentication system
 
-
   - Create Supabase auth configuration and user registration flow
   - Implement AuthProvider context with sign up, sign in, and sign out functionality
   - Add automatic wallet creation trigger for new users with 5 green wishes starting balance
   - Create user profile management and username validation
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 3. Build wallet management system
+- [x] 3. Build wallet management system
+
 
   - Implement WalletProvider context for managing user currency balances
   - Create WalletCard component to display current balances of all three currencies
@@ -25,7 +25,12 @@
   - Create CurrencyConverter component with validation and transaction recording
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 4. Develop wish creation and management
+- [x] 4. Develop wish creation and management
+
+
+
+
+
 
   - Create WishForm component with title, description, and type selection
   - Implement wish validation (title ≤100 chars, description ≤500 chars)

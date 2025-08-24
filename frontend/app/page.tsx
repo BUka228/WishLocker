@@ -1,6 +1,6 @@
 'use client'
 
-import { WalletCard } from '@/components/WalletCard'
+import { WalletCard } from '@/components/wallet/WalletCard'
 import { WishList } from '@/components/WishList'
 import { QuickActions } from '@/components/QuickActions'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'

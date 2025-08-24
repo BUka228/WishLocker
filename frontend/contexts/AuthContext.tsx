@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { User } from '../../shared/types'
+import { User } from '../lib/types'
 import { validateUsername, validateEmail, validatePassword } from '../lib/validation'
 import { getAuthErrorMessage } from '../lib/auth-errors'
 
