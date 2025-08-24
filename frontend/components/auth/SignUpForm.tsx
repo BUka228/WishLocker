@@ -1,10 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { validateUsername, validateEmail, validatePassword } from '../../lib/validation'
 import { useToast } from '../ui/Toast'
-import { LoadingButton } from '../ui/LoadingSpinner'
+import { LoadingButton } from '../ui/LoadingStates'
+import { TextInput, FormErrorSummary } from '../ui/FormInputs'
+import { useFormValidation } from '../../hooks/useFormValidation'
+import { ErrorBoundary } from '../error/ErrorBoundary'
 
 interface SignUpFormProps {
   onSuccess?: () => void
@@ -12,181 +15,159 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ onSuccess, onSwitchToSignIn }: SignUpFormProps) {
-  const { signUp, loading } = useAuth()
+  const { signUp } = useAuth()
   const { showToast } = useToast()
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    username: '',
+
+  const {
+    formState,
+    isSubmitting,
+    submitError,
+    getFieldProps,
+    handleSubmit,
+    isValid,
+    getErrors
+  } = useFormValidation({
+    initialValues: {
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    },
+    validationRules: {
+      username: validateUsername,
+      email: validateEmail,
+      password: validatePassword,
+      confirmPassword: (value: string) => {
+        const password = formState.password?.value || ''
+        if (!value) {
+          return { isValid: false, error: 'Подтверждение пароля обязательно' }
+        }
+        if (value !== password) {
+          return { isValid: false, error: 'Пароли не совпадают' }
+        }
+        return { isValid: true }
+      }
+    },
+    validateOnBlur: true,
+    showToastOnError: false
   })
-  const [error, setError] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-
-    // Validate form
-    if (!formData.email || !formData.password || !formData.username) {
-      setError('Пожалуйста, заполните все поля')
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Пароли не совпадают')
-      return
-    }
-
-    // Validate email
-    const emailValidation = validateEmail(formData.email)
-    if (!emailValidation.isValid) {
-      setError(emailValidation.error!)
-      return
-    }
-
-    // Validate password
-    const passwordValidation = validatePassword(formData.password)
-    if (!passwordValidation.isValid) {
-      setError(passwordValidation.error!)
-      return
-    }
-
-    // Validate username
-    const usernameValidation = validateUsername(formData.username)
-    if (!usernameValidation.isValid) {
-      setError(usernameValidation.error!)
-      return
-    }
-
+  const onSubmit = async (values: Record<string, any>) => {
     try {
-      await signUp(formData.email, formData.password, formData.username)
+      await signUp(values.email, values.password, values.username)
       showToast({
         type: 'success',
         title: 'Регистрация успешна!',
         message: 'Добро пожаловать в Банк Желаний!'
       })
       onSuccess?.()
-    } catch (err: any) {
-      const errorMessage = err.message || 'Произошла ошибка при регистрации'
-      setError(errorMessage)
-      showToast({
-        type: 'error',
-        title: 'Ошибка регистрации',
-        message: errorMessage
-      })
+    } catch (error: any) {
+      // Error will be handled by the form validation hook
+      throw error
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }))
-  }
+  const errors = getErrors()
+  const hasFormErrors = Object.keys(errors).length > 0 || submitError
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
-          Регистрация
-        </h2>
+    <ErrorBoundary>
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+            Регистрация
+          </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-              Имя пользователя
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          <form onSubmit={(e) => {
+            e.preventDefault()
+            handleSubmit(onSubmit)
+          }} className="space-y-4">
+            
+            {/* Error Summary */}
+            {hasFormErrors && (
+              <FormErrorSummary 
+                errors={{
+                  ...errors,
+                  ...(submitError ? { submit: submitError } : {})
+                }} 
+              />
+            )}
+
+            {/* Username Field */}
+            <TextInput
+              {...getFieldProps('username')}
+              label="Имя пользователя"
               placeholder="Введите имя пользователя"
-              disabled={loading}
               required
+              maxLength={20}
+              showCharCount
+              helperText="От 3 до 20 символов. Только буквы, цифры, дефисы и подчеркивания"
+              autoComplete="username"
+              disabled={isSubmitting}
             />
-          </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
+            {/* Email Field */}
+            <TextInput
+              {...getFieldProps('email')}
               type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              label="Email"
               placeholder="Введите email"
-              disabled={loading}
               required
+              autoComplete="email"
+              helperText="Мы используем email для входа в систему"
+              disabled={isSubmitting}
             />
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Пароль
-            </label>
-            <input
+            {/* Password Field */}
+            <TextInput
+              {...getFieldProps('password')}
               type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              label="Пароль"
               placeholder="Введите пароль"
-              disabled={loading}
               required
+              minLength={6}
+              maxLength={128}
+              autoComplete="new-password"
+              helperText="Минимум 6 символов. Рекомендуем использовать заглавные буквы, цифры и специальные символы"
+              disabled={isSubmitting}
             />
-          </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-              Подтвердите пароль
-            </label>
-            <input
+            {/* Confirm Password Field */}
+            <TextInput
+              {...getFieldProps('confirmPassword')}
               type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              label="Подтвердите пароль"
               placeholder="Подтвердите пароль"
-              disabled={loading}
               required
+              autoComplete="new-password"
+              disabled={isSubmitting}
             />
-          </div>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-              {error}
+            {/* Submit Button */}
+            <LoadingButton
+              type="submit"
+              loading={isSubmitting}
+              disabled={!isValid || isSubmitting}
+              className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
+            >
+              {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
+            </LoadingButton>
+          </form>
+
+          {onSwitchToSignIn && (
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={onSwitchToSignIn}
+                className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                disabled={isSubmitting}
+              >
+                Уже есть аккаунт? Войти
+              </button>
             </div>
           )}
-
-          <LoadingButton
-            type="submit"
-            loading={loading}
-            className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
-          >
-            {loading ? 'Регистрация...' : 'Зарегистрироваться'}
-          </LoadingButton>
-        </form>
-
-        {onSwitchToSignIn && (
-          <div className="mt-4 text-center">
-            <button
-              type="button"
-              onClick={onSwitchToSignIn}
-              className="text-purple-600 hover:text-purple-700 text-sm font-medium"
-            >
-              Уже есть аккаунт? Войти
-            </button>
-          </div>
-        )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   )
 }

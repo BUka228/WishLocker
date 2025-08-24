@@ -9,6 +9,7 @@ import { NotificationProvider } from '../contexts/NotificationContext'
 import { AchievementProvider } from '../contexts/AchievementContext'
 import { ToastProvider } from '../components/ui/Toast'
 import { GlobalAchievementNotifications } from '../components/achievements/GlobalAchievementNotifications'
+import { ErrorBoundary, WalletErrorBoundary, WishErrorBoundary, SocialErrorBoundary } from '../components/error/ErrorBoundary'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
@@ -25,26 +26,34 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={inter.className}>
-        <ToastProvider>
-          <AuthProvider>
-            <WalletProvider>
-              <SocialProvider>
-                <WishProvider>
-                  <DisputeProvider>
-                    <NotificationProvider>
-                      <AchievementProvider>
-                        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-                          {children}
-                          <GlobalAchievementNotifications />
-                        </div>
-                      </AchievementProvider>
-                    </NotificationProvider>
-                  </DisputeProvider>
-                </WishProvider>
-              </SocialProvider>
-            </WalletProvider>
-          </AuthProvider>
-        </ToastProvider>
+        <ErrorBoundary>
+          <ToastProvider>
+            <AuthProvider>
+              <WalletErrorBoundary>
+                <WalletProvider>
+                  <SocialErrorBoundary>
+                    <SocialProvider>
+                      <WishErrorBoundary>
+                        <WishProvider>
+                          <DisputeProvider>
+                            <NotificationProvider>
+                              <AchievementProvider>
+                                <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+                                  {children}
+                                  <GlobalAchievementNotifications />
+                                </div>
+                              </AchievementProvider>
+                            </NotificationProvider>
+                          </DisputeProvider>
+                        </WishProvider>
+                      </WishErrorBoundary>
+                    </SocialProvider>
+                  </SocialErrorBoundary>
+                </WalletProvider>
+              </WalletErrorBoundary>
+            </AuthProvider>
+          </ToastProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
