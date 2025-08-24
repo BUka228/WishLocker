@@ -41,6 +41,10 @@
 
 - [ ] 5. Build wish browsing and filtering system
 
+
+
+
+
   - Create WishList component displaying all available wishes with status indicators
   - Implement wish filtering by type (green/blue/red) and status
   - Add WishCard component showing title, description, type, cost, creator, and status

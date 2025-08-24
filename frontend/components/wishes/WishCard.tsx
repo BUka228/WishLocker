@@ -75,6 +75,28 @@ export function WishCard({ wish }: WishCardProps) {
     })
   }
 
+  const getTimeRemaining = (deadline: string) => {
+    const now = new Date()
+    const deadlineDate = new Date(deadline)
+    const diffMs = deadlineDate.getTime() - now.getTime()
+    
+    if (diffMs <= 0) {
+      return { text: 'Просрочено', isOverdue: true }
+    }
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+    
+    if (diffDays > 0) {
+      return { text: `${diffDays} дн. ${diffHours} ч.`, isOverdue: false }
+    } else if (diffHours > 0) {
+      return { text: `${diffHours} ч. ${diffMinutes} мин.`, isOverdue: false }
+    } else {
+      return { text: `${diffMinutes} мин.`, isOverdue: false }
+    }
+  }
+
   const getStatusIcon = () => {
     switch (wish.status) {
       case 'active':
@@ -91,7 +113,11 @@ export function WishCard({ wish }: WishCardProps) {
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-md border-l-4 border-l-${wishMetadata.color}-500 p-4 hover:shadow-lg transition-shadow`}>
+    <div className={`bg-white rounded-lg shadow-md border-l-4 p-4 hover:shadow-lg transition-shadow ${
+      wish.type === 'green' ? 'border-l-green-500 bg-gradient-to-r from-green-50 to-white' :
+      wish.type === 'blue' ? 'border-l-blue-500 bg-gradient-to-r from-blue-50 to-white' :
+      'border-l-red-500 bg-gradient-to-r from-red-50 to-white'
+    }`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center">
@@ -107,15 +133,24 @@ export function WishCard({ wish }: WishCardProps) {
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center">
+        <div className="flex items-center space-x-3">
+          <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+            wish.status === 'active' ? 'bg-yellow-100 text-yellow-800' :
+            wish.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+            wish.status === 'completed' ? 'bg-green-100 text-green-800' :
+            'bg-red-100 text-red-800'
+          }`}>
             {getStatusIcon()}
-            <span className="ml-1 text-sm text-gray-600">
+            <span className="ml-1">
               {statusMetadata.name}
             </span>
           </div>
-          <div className="text-sm font-medium text-gray-700">
-            {wish.cost} {wishMetadata.name.toLowerCase()}
+          <div className={`text-sm font-medium px-2 py-1 rounded-lg ${
+            wish.type === 'green' ? 'bg-green-100 text-green-800' :
+            wish.type === 'blue' ? 'bg-blue-100 text-blue-800' :
+            'bg-red-100 text-red-800'
+          }`}>
+            {wishMetadata.emoji} {wish.cost} {wishMetadata.name.toLowerCase()}
           </div>
         </div>
       </div>
@@ -137,9 +172,24 @@ export function WishCard({ wish }: WishCardProps) {
 
       {/* Deadline */}
       {wish.deadline && (
-        <div className="flex items-center text-sm text-orange-600 mb-3">
-          <Calendar className="w-4 h-4 mr-1" />
-          <span>Дедлайн: {formatDate(wish.deadline)}</span>
+        <div className="mb-3">
+          <div className="flex items-center text-sm text-gray-600 mb-1">
+            <Calendar className="w-4 h-4 mr-1" />
+            <span>Дедлайн: {formatDate(wish.deadline)}</span>
+          </div>
+          {(() => {
+            const timeRemaining = getTimeRemaining(wish.deadline)
+            return (
+              <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                timeRemaining.isOverdue 
+                  ? 'bg-red-100 text-red-800' 
+                  : 'bg-orange-100 text-orange-800'
+              }`}>
+                <Clock className="w-3 h-3 mr-1" />
+                {timeRemaining.isOverdue ? 'Просрочено' : `Осталось: ${timeRemaining.text}`}
+              </div>
+            )
+          })()}
         </div>
       )}
 

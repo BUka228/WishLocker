@@ -2,20 +2,22 @@
 
 import { useState } from 'react'
 import { Filter, Plus, RefreshCw, AlertCircle } from 'lucide-react'
-import { WishType, WISH_METADATA } from '@/lib/types'
+import { WishType, WishStatus, WISH_METADATA, STATUS_METADATA } from '@/lib/types'
 import { useWish } from '@/contexts/WishContext'
 import { WishCard } from './wishes/WishCard'
 import { WishForm } from './wishes/WishForm'
 
 export function WishList() {
-  const [filter, setFilter] = useState<'all' | WishType>('all')
+  const [typeFilter, setTypeFilter] = useState<'all' | WishType>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | WishStatus>('all')
   const [showCreateForm, setShowCreateForm] = useState(false)
   
   const { wishes, loading, error, filterWishes, refreshWishes } = useWish()
 
-  const filteredWishes = filter === 'all' 
-    ? wishes 
-    : filterWishes({ type: filter })
+  const filteredWishes = filterWishes({
+    type: typeFilter === 'all' ? undefined : typeFilter,
+    status: statusFilter === 'all' ? undefined : statusFilter
+  })
 
   const handleRefresh = () => {
     refreshWishes()
@@ -74,17 +76,33 @@ export function WishList() {
               <RefreshCw className="w-5 h-5" />
             </button>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <Filter className="w-5 h-5 text-gray-500" />
+              
+              {/* Type Filter */}
               <select 
-                value={filter} 
-                onChange={(e) => setFilter(e.target.value as any)}
+                value={typeFilter} 
+                onChange={(e) => setTypeFilter(e.target.value as any)}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">Все типы</option>
                 {(Object.keys(WISH_METADATA) as WishType[]).map((type) => (
                   <option key={type} value={type}>
                     {WISH_METADATA[type].emoji} {WISH_METADATA[type].name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Status Filter */}
+              <select 
+                value={statusFilter} 
+                onChange={(e) => setStatusFilter(e.target.value as any)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">Все статусы</option>
+                {(Object.keys(STATUS_METADATA) as WishStatus[]).map((status) => (
+                  <option key={status} value={status}>
+                    {STATUS_METADATA[status].name}
                   </option>
                 ))}
               </select>
@@ -96,15 +114,15 @@ export function WishList() {
           {filteredWishes.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 mb-2">
-                {filter === 'all' ? '📝' : WISH_METADATA[filter as WishType]?.emoji}
+                {typeFilter === 'all' ? '📝' : WISH_METADATA[typeFilter as WishType]?.emoji}
               </div>
               <p className="text-gray-600">
-                {filter === 'all' 
+                {typeFilter === 'all' && statusFilter === 'all'
                   ? 'Пока нет желаний. Создайте первое!' 
-                  : `Нет ${WISH_METADATA[filter as WishType]?.name.toLowerCase()} желаний`
+                  : 'Нет желаний, соответствующих выбранным фильтрам'
                 }
               </p>
-              {filter === 'all' && (
+              {typeFilter === 'all' && statusFilter === 'all' && (
                 <button
                   onClick={() => setShowCreateForm(true)}
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
