@@ -11,6 +11,7 @@ interface Notification {
   title: string
   message: string
   read: boolean
+  data?: any
   created_at: string | null
 }
 

@@ -101,7 +101,6 @@
 
 - [x] 12. Implement error handling and validation
 
-
   - Create comprehensive client-side error boundary components
   - Add API error handling with user-friendly error messages
   - Implement form validation for all user inputs
@@ -110,7 +109,8 @@
   - Implement loading states and error recovery mechanisms
   - _Requirements: All requirements - error handling aspects_
 
-- [ ] 13. Add real-time features and notifications
+- [x] 13. Add real-time features and notifications
+
 
   - Implement real-time wallet balance updates using Supabase subscriptions
   - Add live wish status updates and new wish notifications

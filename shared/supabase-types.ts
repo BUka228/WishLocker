@@ -286,6 +286,7 @@ export type Database = {
           title: string
           message: string
           read: boolean
+          data: Json | null
           created_at: string | null
         }
         Insert: {
@@ -295,6 +296,7 @@ export type Database = {
           title: string
           message: string
           read?: boolean
+          data?: Json | null
           created_at?: string | null
         }
         Update: {
@@ -304,6 +306,7 @@ export type Database = {
           title?: string
           message?: string
           read?: boolean
+          data?: Json | null
           created_at?: string | null
         }
         Relationships: [
@@ -311,6 +314,53 @@ export type Database = {
             foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          email_notifications: boolean
+          push_notifications: boolean
+          friend_requests: boolean
+          wish_updates: boolean
+          achievements: boolean
+          currency_gifts: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          email_notifications?: boolean
+          push_notifications?: boolean
+          friend_requests?: boolean
+          wish_updates?: boolean
+          achievements?: boolean
+          currency_gifts?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          email_notifications?: boolean
+          push_notifications?: boolean
+          friend_requests?: boolean
+          wish_updates?: boolean
+          achievements?: boolean
+          currency_gifts?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -553,6 +603,56 @@ export type Database = {
           resolved_at: string | null
           created_at: string
         }[]
+      }
+      create_notification: {
+        Args: {
+          p_user_id: string
+          p_type: string
+          p_title: string
+          p_message: string
+          p_data?: Json
+        }
+        Returns: string
+      }
+      get_notification_preferences: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          email_notifications: boolean
+          push_notifications: boolean
+          friend_requests: boolean
+          wish_updates: boolean
+          achievements: boolean
+          currency_gifts: boolean
+          created_at: string
+          updated_at: string
+        }
+      }
+      update_notification_preferences: {
+        Args: {
+          p_user_id: string
+          p_email_notifications?: boolean
+          p_push_notifications?: boolean
+          p_friend_requests?: boolean
+          p_wish_updates?: boolean
+          p_achievements?: boolean
+          p_currency_gifts?: boolean
+        }
+        Returns: {
+          id: string
+          user_id: string
+          email_notifications: boolean
+          push_notifications: boolean
+          friend_requests: boolean
+          wish_updates: boolean
+          achievements: boolean
+          currency_gifts: boolean
+          created_at: string
+          updated_at: string
+        }
       }
     }
     Enums: {

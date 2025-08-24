@@ -6,9 +6,11 @@ import { SocialProvider } from '../contexts/SocialContext'
 import { WishProvider } from '../contexts/WishContext'
 import { DisputeProvider } from '../contexts/DisputeContext'
 import { NotificationProvider } from '../contexts/NotificationContext'
+import { NotificationPreferencesProvider } from '../contexts/NotificationPreferencesContext'
 import { AchievementProvider } from '../contexts/AchievementContext'
 import { ToastProvider } from '../components/ui/Toast'
 import { GlobalAchievementNotifications } from '../components/achievements/GlobalAchievementNotifications'
+import { LiveNotifications } from '../components/notifications/LiveNotifications'
 import { ErrorBoundary, WalletErrorBoundary, WishErrorBoundary, SocialErrorBoundary } from '../components/error/ErrorBoundary'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
@@ -37,12 +39,15 @@ export default function RootLayout({
                         <WishProvider>
                           <DisputeProvider>
                             <NotificationProvider>
-                              <AchievementProvider>
+                              <NotificationPreferencesProvider>
+                                <AchievementProvider>
                                 <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
                                   {children}
                                   <GlobalAchievementNotifications />
+                                  <LiveNotifications />
                                 </div>
-                              </AchievementProvider>
+                                </AchievementProvider>
+                              </NotificationPreferencesProvider>
                             </NotificationProvider>
                           </DisputeProvider>
                         </WishProvider>

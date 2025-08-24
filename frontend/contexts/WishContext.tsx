@@ -62,6 +62,162 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, friends])
 
+  // Set up real-time subscriptions for wishes
+  useEffect(() => {
+    if (!user) return
+
+    const subscription = supabase
+      .channel('wishes_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'wishes',
+        },
+        (payload) => {
+          console.log('New wish created:', payload)
+          const newWish = payload.new as any
+          
+          // Only add to local state if it's visible to current user
+          // (either user's own wish or friend's wish)
+          const friendIds = friends.map(f => f.id)
+          const visibleUserIds = [user.id, ...friendIds]
+          
+          if (visibleUserIds.includes(newWish.creator_id)) {
+            // Fetch full wish data with relations
+            supabase
+              .from('wishes')
+              .select(`
+                *,
+                creator:users!creator_id(id, username, avatar_url),
+                assignee:users!assignee_id(id, username, avatar_url)
+              `)
+              .eq('id', newWish.id)
+              .single()
+              .then(({ data, error }) => {
+                if (!error && data) {
+                  setWishes(prev => [data as unknown as Wish, ...prev])
+                  
+                  // Create notification for new wish from friends
+                  if (newWish.creator_id !== user.id) {
+                    // This is a friend's wish, create notification
+                    supabase
+                      .from('notifications')
+                      .insert({
+                        user_id: user.id,
+                        type: 'new_wish',
+                        title: 'Новое желание!',
+                        message: `${data.creator?.username || 'Друг'} создал новое желание: ${newWish.title}`,
+                      })
+                      .then(({ error }) => {
+                        if (error) console.error('Error creating notification:', error)
+                      })
+                  }
+                }
+              })
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'wishes',
+        },
+        (payload) => {
+          console.log('Wish updated:', payload)
+          const updatedWish = payload.new as any
+          
+          // Update local state
+          setWishes(prev => 
+            prev.map(wish => {
+              if (wish.id === updatedWish.id) {
+                // Fetch full updated data with relations
+                supabase
+                  .from('wishes')
+                  .select(`
+                    *,
+                    creator:users!creator_id(id, username, avatar_url),
+                    assignee:users!assignee_id(id, username, avatar_url)
+                  `)
+                  .eq('id', updatedWish.id)
+                  .single()
+                  .then(({ data, error }) => {
+                    if (!error && data) {
+                      setWishes(prevWishes => 
+                        prevWishes.map(w => 
+                          w.id === updatedWish.id ? data as unknown as Wish : w
+                        )
+                      )
+                    }
+                  })
+                
+                // Create notifications for status changes
+                if (payload.old && payload.old.status !== updatedWish.status) {
+                  // Notify creator when wish is accepted
+                  if (updatedWish.status === 'in_progress' && updatedWish.assignee_id && updatedWish.creator_id !== user.id) {
+                    supabase
+                      .from('notifications')
+                      .insert({
+                        user_id: updatedWish.creator_id,
+                        type: 'wish_accepted',
+                        title: 'Желание принято!',
+                        message: `Ваше желание "${updatedWish.title}" принято к выполнению`,
+                      })
+                      .then(({ error }) => {
+                        if (error) console.error('Error creating notification:', error)
+                      })
+                  }
+                  
+                  // Notify assignee when wish is completed
+                  if (updatedWish.status === 'completed' && updatedWish.assignee_id === user.id) {
+                    supabase
+                      .from('notifications')
+                      .insert({
+                        user_id: user.id,
+                        type: 'wish_completed',
+                        title: 'Желание выполнено!',
+                        message: `Вы успешно выполнили желание "${updatedWish.title}"`,
+                      })
+                      .then(({ error }) => {
+                        if (error) console.error('Error creating notification:', error)
+                      })
+                  }
+                  
+                  // Notify creator when wish is completed
+                  if (updatedWish.status === 'completed' && updatedWish.creator_id === user.id) {
+                    supabase
+                      .from('notifications')
+                      .insert({
+                        user_id: user.id,
+                        type: 'wish_fulfilled',
+                        title: 'Желание исполнено!',
+                        message: `Ваше желание "${updatedWish.title}" было выполнено`,
+                      })
+                      .then(({ error }) => {
+                        if (error) console.error('Error creating notification:', error)
+                      })
+                  }
+                }
+                
+                return wish
+              }
+              return wish
+            })
+          )
+        }
+      )
+      .subscribe()
+
+    return () => {
+      if (subscription && typeof subscription.unsubscribe === 'function') {
+        subscription.unsubscribe()
+      }
+    }
+  }, [user, friends])
+
   const refreshWishes = async () => {
     if (!user) return
 

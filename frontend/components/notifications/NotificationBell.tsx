@@ -92,8 +92,15 @@ export function NotificationBell() {
             )}
           </div>
 
-          {notifications.length > 0 && (
-            <div className="p-3 border-t text-center">
+          <div className="p-3 border-t">
+            <div className="flex items-center justify-between">
+              <a
+                href="/notifications/settings"
+                className="text-sm text-blue-600 hover:text-blue-800"
+                onClick={() => setIsOpen(false)}
+              >
+                Настройки
+              </a>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-sm text-gray-600 hover:text-gray-800"
@@ -101,7 +108,7 @@ export function NotificationBell() {
                 Закрыть
               </button>
             </div>
-          )}
+          </div>
         </div>
       )}
 
