@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { useSocial } from '@/contexts/SocialContext'
 import { useAuth } from '@/contexts/AuthContext'
-import { User } from '@/shared/types'
+import { User } from '@/lib/types'
 import { Search, UserPlus, Check, Clock, X } from 'lucide-react'
 import { debounce } from 'lodash'
 

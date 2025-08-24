@@ -10,9 +10,8 @@ interface Notification {
   type: string
   title: string
   message: string
-  data: Record<string, any>
   read: boolean
-  created_at: string
+  created_at: string | null
 }
 
 interface NotificationContextType {

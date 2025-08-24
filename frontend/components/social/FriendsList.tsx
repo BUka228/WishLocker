@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useSocial } from '@/contexts/SocialContext'
-import { User } from '@/shared/types'
+import { User } from '@/lib/types'
 import { UserPlus, UserMinus, UserX, MessageCircle } from 'lucide-react'
 
 interface FriendsListProps {

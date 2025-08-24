@@ -4,8 +4,7 @@ import React, { useState } from 'react'
 import { Gift, X, Check, AlertCircle } from 'lucide-react'
 import { useWallet } from '@/contexts/WalletContext'
 import { useSocial } from '@/contexts/SocialContext'
-import { CurrencyType, WISH_METADATA } from '@/shared/types'
-import { User } from '@/shared/types'
+import { CurrencyType, WISH_METADATA, User } from '@/lib/types'
 
 interface CurrencyGiftProps {
   isOpen: boolean

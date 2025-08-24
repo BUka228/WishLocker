@@ -82,7 +82,6 @@
 
 - [x] 10. Build transaction history system
 
-
   - Create TransactionHistory component displaying chronological transaction list
   - Implement transaction detail display (type, currency, amount, description, date)
   - Add wish linking for wish-related transactions
@@ -90,7 +89,8 @@
   - Implement transaction search and pagination for large histories
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [ ] 11. Develop achievement system
+- [x] 11. Develop achievement system
+
 
   - Create achievement tracking database functions and triggers
   - Implement achievement types: first wish, wish master, converter, legendary fulfiller

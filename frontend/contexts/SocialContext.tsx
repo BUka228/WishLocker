@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './AuthContext'
-import { User, Friendship } from '@/shared/types'
+import { User, Friendship } from '@/lib/types'
 
 interface SocialContextType {
   friends: User[]
@@ -131,11 +131,11 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      if (result && result.success) {
+      if (result) {
         await loadFriendships()
         return true
       } else {
-        console.error('Friend request failed:', result?.message)
+        console.error('Friend request failed')
         return false
       }
     } catch (error) {
@@ -156,11 +156,11 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      if (result && result.success) {
+      if (result) {
         await loadFriendships()
         return true
       } else {
-        console.error('Accept friend request failed:', result?.message)
+        console.error('Accept friend request failed')
         return false
       }
     } catch (error) {
@@ -181,11 +181,11 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      if (result && result.success) {
+      if (result) {
         await loadFriendships()
         return true
       } else {
-        console.error('Reject friend request failed:', result?.message)
+        console.error('Reject friend request failed')
         return false
       }
     } catch (error) {
@@ -206,11 +206,11 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      if (result && result.success) {
+      if (result) {
         await loadFriendships()
         return true
       } else {
-        console.error('Block user failed:', result?.message)
+        console.error('Block user failed')
         return false
       }
     } catch (error) {
@@ -231,11 +231,11 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      if (result && result.success) {
+      if (result) {
         await loadFriendships()
         return true
       } else {
-        console.error('Unblock user failed:', result?.message)
+        console.error('Unblock user failed')
         return false
       }
     } catch (error) {

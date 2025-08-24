@@ -217,8 +217,10 @@ export function WalletProvider({ children }: WalletProviderProps) {
         return false
       }
 
-      if (!result?.success) {
-        const errorMessage = result?.message || 'Не удалось выполнить перевод'
+      const transferResult = result as { success?: boolean; message?: string; error?: string }
+      
+      if (!transferResult?.success) {
+        const errorMessage = transferResult?.message || 'Не удалось выполнить перевод'
         setError(errorMessage)
         return false
       }

@@ -5,6 +5,7 @@ export type WishStatus = 'active' | 'in_progress' | 'completed' | 'rejected' | '
 export type DisputeStatus = 'pending' | 'accepted' | 'rejected'
 export type TransactionType = 'earn' | 'spend' | 'convert'
 export type CurrencyType = 'green' | 'blue' | 'red'
+export type AchievementType = 'first_wish' | 'wish_master' | 'converter' | 'legendary_fulfiller'
 
 export interface User {
   id: string
@@ -49,19 +50,30 @@ export interface Transaction {
   currency: CurrencyType
   amount: number
   description: string
-  related_wish_id?: string
-  created_at: string
+  related_wish_id?: string | null
+  created_at: string | null
   // Relations
-  related_wish?: Wish
+  related_wish?: Partial<Wish> | null
 }
 
 export interface Achievement {
   id: string
   user_id: string
   achievement_type: string
+  achievement_type_enum?: AchievementType
+  title: string
+  description: string | null
+  earned_at: string | null
+}
+
+export interface AchievementProgress {
+  achievement_type: AchievementType
   title: string
   description: string
-  earned_at: string
+  earned: boolean
+  earned_at: string | null
+  progress: number
+  max_progress: number
 }
 
 export interface Friendship {
@@ -166,5 +178,37 @@ export const DISPUTE_STATUS_METADATA = {
   rejected: {
     name: 'Отклонено',
     color: 'red',
+  },
+} as const
+
+// Achievement metadata
+export const ACHIEVEMENT_METADATA = {
+  first_wish: {
+    title: 'Первое желание',
+    description: 'Создал своё первое желание в системе',
+    icon: '🌟',
+    color: 'yellow',
+    rarity: 'common',
+  },
+  wish_master: {
+    title: 'Мастер желаний',
+    description: 'Выполнил 5 желаний других пользователей',
+    icon: '🏆',
+    color: 'gold',
+    rarity: 'rare',
+  },
+  converter: {
+    title: 'Конвертер',
+    description: 'Впервые конвертировал валюту',
+    icon: '🔄',
+    color: 'blue',
+    rarity: 'common',
+  },
+  legendary_fulfiller: {
+    title: 'Легендарный исполнитель',
+    description: 'Выполнил красное (легендарное) желание',
+    icon: '👑',
+    color: 'red',
+    rarity: 'legendary',
   },
 } as const

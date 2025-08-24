@@ -6,7 +6,9 @@ import { SocialProvider } from '../contexts/SocialContext'
 import { WishProvider } from '../contexts/WishContext'
 import { DisputeProvider } from '../contexts/DisputeContext'
 import { NotificationProvider } from '../contexts/NotificationContext'
+import { AchievementProvider } from '../contexts/AchievementContext'
 import { ToastProvider } from '../components/ui/Toast'
+import { GlobalAchievementNotifications } from '../components/achievements/GlobalAchievementNotifications'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
@@ -30,9 +32,12 @@ export default function RootLayout({
                 <WishProvider>
                   <DisputeProvider>
                     <NotificationProvider>
-                      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-                        {children}
-                      </div>
+                      <AchievementProvider>
+                        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+                          {children}
+                          <GlobalAchievementNotifications />
+                        </div>
+                      </AchievementProvider>
                     </NotificationProvider>
                   </DisputeProvider>
                 </WishProvider>

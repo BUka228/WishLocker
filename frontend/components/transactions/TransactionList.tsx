@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Transaction, CurrencyType, TransactionType } from '@/shared/types'
+import { Transaction, CurrencyType, TransactionType } from '@/lib/types'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { Clock, ExternalLink, ArrowRight } from 'lucide-react'
@@ -198,7 +198,7 @@ export default function TransactionList({
                         )}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {formatDate(transaction.created_at)}
+                        {transaction.created_at ? formatDate(transaction.created_at) : 'Неизвестно'}
                       </div>
                     </div>
                   </div>

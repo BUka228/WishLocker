@@ -5,7 +5,7 @@ import { useWallet } from '../../contexts/WalletContext'
 import { WISH_METADATA } from '../../lib/types'
 import { Wallet, RefreshCw, Gift } from 'lucide-react'
 import { CurrencyGift } from './CurrencyGift'
-import { TransactionList } from '../transactions/TransactionList'
+import TransactionList from '../transactions/TransactionList'
 
 interface WalletCardProps {
   className?: string

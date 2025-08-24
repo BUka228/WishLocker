@@ -278,6 +278,108 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: string
+          title: string
+          message: string
+          read: boolean
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: string
+          title: string
+          message: string
+          read?: boolean
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: string
+          title?: string
+          message?: string
+          read?: boolean
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disputes: {
+        Row: {
+          id: string
+          wish_id: string
+          disputer_id: string
+          comment: string
+          alternative_description: string | null
+          status: Database["public"]["Enums"]["dispute_status"]
+          resolution_comment: string | null
+          resolved_by: string | null
+          resolved_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          wish_id: string
+          disputer_id: string
+          comment: string
+          alternative_description?: string | null
+          status?: Database["public"]["Enums"]["dispute_status"]
+          resolution_comment?: string | null
+          resolved_by?: string | null
+          resolved_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          wish_id?: string
+          disputer_id?: string
+          comment?: string
+          alternative_description?: string | null
+          status?: Database["public"]["Enums"]["dispute_status"]
+          resolution_comment?: string | null
+          resolved_by?: string | null
+          resolved_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_wish_id_fkey"
+            columns: ["wish_id"]
+            isOneToOne: false
+            referencedRelation: "wishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_disputer_id_fkey"
+            columns: ["disputer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -310,11 +412,155 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_achievement_progress: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          achievement_type: Database["public"]["Enums"]["achievement_type_enum"]
+          title: string
+          description: string
+          earned: boolean
+          earned_at: string | null
+          progress: number
+          max_progress: number
+        }[]
+      }
+      get_unread_notification_count: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: number
+      }
+      mark_notification_read: {
+        Args: {
+          p_notification_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      send_friend_request: {
+        Args: {
+          p_user_id: string
+          p_friend_id: string
+        }
+        Returns: boolean
+      }
+      accept_friend_request: {
+        Args: {
+          p_request_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      reject_friend_request: {
+        Args: {
+          p_request_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      block_user: {
+        Args: {
+          p_user_id: string
+          p_target_id: string
+        }
+        Returns: boolean
+      }
+      unblock_user: {
+        Args: {
+          p_user_id: string
+          p_target_id: string
+        }
+        Returns: boolean
+      }
+      transfer_currency_to_friend: {
+        Args: {
+          p_sender_id: string
+          p_receiver_id: string
+          p_currency: Database["public"]["Enums"]["currency_type"]
+          p_amount: number
+        }
+        Returns: Json
+      }
+      create_dispute: {
+        Args: {
+          p_wish_id: string
+          p_disputer_id: string
+          p_comment: string
+          p_alternative_description?: string
+        }
+        Returns: Json
+      }
+      resolve_dispute: {
+        Args: {
+          p_dispute_id: string
+          p_resolver_id: string
+          p_action: string
+          p_resolution_comment?: string
+        }
+        Returns: Json
+      }
+      get_wish_disputes: {
+        Args: {
+          p_wish_id: string
+        }
+        Returns: {
+          id: string
+          wish_id: string
+          disputer_id: string
+          disputer_username: string
+          comment: string
+          alternative_description: string | null
+          status: string
+          resolution_comment: string | null
+          resolved_by: string | null
+          resolved_at: string | null
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      get_user_disputes: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          id: string
+          wish_id: string
+          wish_title: string
+          wish_creator_username: string
+          comment: string
+          alternative_description: string | null
+          status: string
+          resolution_comment: string | null
+          resolved_at: string | null
+          created_at: string
+        }[]
+      }
+      get_creator_disputes: {
+        Args: {
+          p_creator_id: string
+        }
+        Returns: {
+          id: string
+          wish_id: string
+          wish_title: string
+          disputer_username: string
+          comment: string
+          alternative_description: string | null
+          status: string
+          resolution_comment: string | null
+          resolved_at: string | null
+          created_at: string
+        }[]
+      }
     }
     Enums: {
+      achievement_type_enum: "first_wish" | "wish_master" | "converter" | "legendary_fulfiller"
       currency_type: "green" | "blue" | "red"
+      dispute_status: "pending" | "accepted" | "rejected"
       transaction_type: "earn" | "spend" | "convert"
-      wish_status: "active" | "in_progress" | "completed" | "rejected"
+      wish_status: "active" | "in_progress" | "completed" | "rejected" | "disputed"
       wish_type: "green" | "blue" | "red"
     }
     CompositeTypes: {

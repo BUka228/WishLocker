@@ -98,10 +98,10 @@ export function NotificationsList({ isOpen, onClose }: NotificationsListProps) {
                           <div className="flex items-center gap-2 mt-2">
                             <Clock className="w-3 h-3 text-gray-400" />
                             <span className="text-xs text-gray-500">
-                              {formatDistanceToNow(new Date(notification.created_at), {
+                              {notification.created_at ? formatDistanceToNow(new Date(notification.created_at), {
                                 addSuffix: true,
                                 locale: ru,
-                              })}
+                              }) : 'Неизвестно'}
                             </span>
                           </div>
                         </div>

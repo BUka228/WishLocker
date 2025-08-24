@@ -2,13 +2,16 @@
 
 import React, { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
-import { User, Edit3, Save, X } from 'lucide-react'
+import { useAchievements } from '../../contexts/AchievementContext'
+import { User, Edit3, Save, X, Trophy } from 'lucide-react'
 import { validateUsername } from '../../lib/validation'
 import { useToast } from '../ui/Toast'
 import { LoadingButton } from '../ui/LoadingSpinner'
+import { AchievementsList } from '../achievements/AchievementsList'
 
 export function UserProfile() {
   const { user, updateProfile, signOut, loading } = useAuth()
+  const { achievements } = useAchievements()
   const { showToast } = useToast()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
@@ -176,6 +179,17 @@ export function UserProfile() {
               day: 'numeric',
             })}
           </p>
+        </div>
+
+        {/* Achievements Section */}
+        <div className="pt-4 border-t border-gray-200">
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="w-5 h-5 text-yellow-600" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Достижения ({achievements.length})
+            </h3>
+          </div>
+          <AchievementsList showProgress={true} layout="grid" />
         </div>
 
         {error && (

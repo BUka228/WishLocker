@@ -363,16 +363,24 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
           p_wish_id: wishId,
           p_disputer_id: user.id,
           p_comment: comment.trim(),
-          p_alternative_description: alternativeDescription?.trim() || null
+          p_alternative_description: alternativeDescription?.trim() || undefined
         })
 
       if (functionError) {
         throw functionError
       }
 
-      if (!functionResult.success) {
+      if (!functionResult) {
         return { 
-          error: functionResult.message || 'Не удалось создать спор' 
+          error: 'Не удалось создать спор' 
+        }
+      }
+
+      const disputeResult = functionResult as { success?: boolean; message?: string }
+      
+      if (!disputeResult.success) {
+        return { 
+          error: disputeResult.message || 'Не удалось создать спор' 
         }
       }
 
@@ -380,7 +388,7 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
       await refreshWishes()
       
       return { 
-        message: functionResult.message || 'Спор отправлен создателю желания' 
+        message: disputeResult.message || 'Спор отправлен создателю желания' 
       }
     } catch (err) {
       console.error('Error creating dispute:', err)

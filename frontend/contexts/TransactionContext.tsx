@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useCallback } from 'react'
-import { Transaction, CurrencyType, TransactionType } from '@/shared/types'
+import { Transaction, CurrencyType, TransactionType } from '@/lib/types'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './AuthContext'
 

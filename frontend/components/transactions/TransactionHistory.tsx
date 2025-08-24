@@ -181,7 +181,7 @@ export default function TransactionHistory({ className = '' }: TransactionHistor
                           <span>•</span>
                           <span>{currency.name}</span>
                           <span>•</span>
-                          <span>{formatDate(transaction.created_at)}</span>
+                          <span>{transaction.created_at ? formatDate(transaction.created_at) : 'Неизвестно'}</span>
                         </div>
                       </div>
                     </div>
