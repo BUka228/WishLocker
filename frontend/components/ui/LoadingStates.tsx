@@ -243,17 +243,30 @@ export function InlineLoading({
 
 export function WishLoadingCard() {
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4">
-      <div className="animate-pulse">
-        <div className="flex items-center justify-between mb-3">
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+    <div className="bg-white rounded-lg shadow-md border-l-4 border-l-gray-200 p-4 animate-pulse">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 space-y-2 sm:space-y-0">
+        <div className="flex items-center min-w-0 flex-1">
+          <div className="w-8 h-8 bg-gray-200 rounded mr-3 flex-shrink-0"></div>
+          <div className="min-w-0 flex-1">
+            <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
         </div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-2/3 mb-3"></div>
-        <div className="flex items-center justify-between">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+          <div className="h-6 bg-gray-200 rounded w-12"></div>
+        </div>
+      </div>
+      
+      <div className="space-y-2 mb-3">
+        <div className="h-4 bg-gray-200 rounded w-full"></div>
+        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      </div>
+      
+      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+        <div className="flex space-x-2">
           <div className="h-8 bg-gray-200 rounded w-20"></div>
+          <div className="h-8 bg-gray-200 rounded w-16"></div>
         </div>
       </div>
     </div>
@@ -262,17 +275,38 @@ export function WishLoadingCard() {
 
 export function WalletLoadingCard() {
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <div className="animate-pulse">
-        <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
-        <div className="grid grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="text-center">
-              <div className="h-8 bg-gray-200 rounded w-full mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
-            </div>
-          ))}
+    <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 bg-gray-200 rounded"></div>
+          <div className="h-6 bg-gray-200 rounded w-24"></div>
         </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-gray-200 rounded"></div>
+          <div className="w-4 h-4 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+      
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              <div>
+                <div className="h-4 bg-gray-200 rounded w-20 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-32"></div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="h-6 bg-gray-200 rounded w-12 mb-1"></div>
+              <div className="h-3 bg-gray-200 rounded w-16"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="h-3 bg-gray-200 rounded w-48 mx-auto"></div>
       </div>
     </div>
   )

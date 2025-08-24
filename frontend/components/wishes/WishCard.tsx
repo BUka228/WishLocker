@@ -140,45 +140,57 @@ export function WishCard({ wish }: WishCardProps) {
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-md border-l-4 p-4 hover:shadow-lg transition-shadow ${
-      wish.type === 'green' ? 'border-l-green-500 bg-gradient-to-r from-green-50 to-white' :
-      wish.type === 'blue' ? 'border-l-blue-500 bg-gradient-to-r from-blue-50 to-white' :
-      'border-l-red-500 bg-gradient-to-r from-red-50 to-white'
-    }`}>
+    <div className={`
+      wish-card group cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl
+      ${wish.type === 'green' ? 'border-l-green-500 bg-gradient-to-r from-green-50 to-white hover:from-green-100' :
+        wish.type === 'blue' ? 'border-l-blue-500 bg-gradient-to-r from-blue-50 to-white hover:from-blue-100' :
+        'border-l-red-500 bg-gradient-to-r from-red-50 to-white hover:from-red-100'
+      }
+      animate-fade-in
+    `}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center">
-          <span className="text-2xl mr-2">{wishMetadata.emoji}</span>
-          <div>
-            <h3 className="font-semibold text-gray-800 text-lg">{wish.title}</h3>
-            <div className="flex items-center text-sm text-gray-500 mt-1">
-              <User className="w-4 h-4 mr-1" />
-              <span>от {wish.creator?.username || 'Неизвестно'}</span>
-              <span className="mx-2">•</span>
-              <span>{formatDate(wish.created_at)}</span>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 space-y-2 sm:space-y-0">
+        <div className="flex items-center min-w-0 flex-1">
+          <span className="text-2xl mr-2 sm:mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+            {wishMetadata.emoji}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-gray-800 text-base sm:text-lg truncate group-hover:text-gray-900 transition-colors duration-200">
+              {wish.title}
+            </h3>
+            <div className="flex items-center text-xs sm:text-sm text-gray-500 mt-1">
+              <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+              <span className="truncate">от {wish.creator?.username || 'Неизвестно'}</span>
+              <span className="mx-2 hidden sm:inline">•</span>
+              <span className="hidden sm:inline">{formatDate(wish.created_at)}</span>
             </div>
           </div>
         </div>
         
-        <div className="flex items-center space-x-3">
-          <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-            wish.status === 'active' ? 'bg-yellow-100 text-yellow-800' :
-            wish.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-            wish.status === 'completed' ? 'bg-green-100 text-green-800' :
-            wish.status === 'disputed' ? 'bg-orange-100 text-orange-800' :
-            'bg-red-100 text-red-800'
-          }`}>
+        <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3 flex-shrink-0">
+          <div className={`
+            flex items-center px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105
+            ${wish.status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' :
+              wish.status === 'in_progress' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
+              wish.status === 'completed' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
+              wish.status === 'disputed' ? 'bg-orange-100 text-orange-800 hover:bg-orange-200' :
+              'bg-red-100 text-red-800 hover:bg-red-200'
+            }
+          `}>
             {getStatusIcon()}
-            <span className="ml-1">
+            <span className="ml-1 hidden sm:inline">
               {statusMetadata.name}
             </span>
           </div>
-          <div className={`text-sm font-medium px-2 py-1 rounded-lg ${
-            wish.type === 'green' ? 'bg-green-100 text-green-800' :
-            wish.type === 'blue' ? 'bg-blue-100 text-blue-800' :
-            'bg-red-100 text-red-800'
-          }`}>
-            {wishMetadata.emoji} {wish.cost} {wishMetadata.name.toLowerCase()}
+          <div className={`
+            text-xs sm:text-sm font-medium px-2 py-1 rounded-lg transition-all duration-200 hover:scale-105
+            ${wish.type === 'green' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
+              wish.type === 'blue' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
+              'bg-red-100 text-red-800 hover:bg-red-200'
+            }
+          `}>
+            <span className="sm:hidden">{wishMetadata.emoji}</span>
+            <span className="hidden sm:inline">{wishMetadata.emoji} {wish.cost} {wishMetadata.name.toLowerCase()}</span>
           </div>
         </div>
       </div>
@@ -223,14 +235,26 @@ export function WishCard({ wish }: WishCardProps) {
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           {canAccept && (
             <button
               onClick={handleAccept}
               disabled={loading}
-              className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors disabled:opacity-50"
+              className="
+                px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium
+                hover:bg-green-200 active:bg-green-300 transition-all duration-200 
+                transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+                focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+              "
             >
-              {loading ? 'Принимаю...' : 'Принять'}
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                  <span>Принимаю...</span>
+                </div>
+              ) : (
+                'Принять'
+              )}
             </button>
           )}
           
@@ -238,9 +262,21 @@ export function WishCard({ wish }: WishCardProps) {
             <button
               onClick={handleComplete}
               disabled={loading}
-              className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors disabled:opacity-50"
+              className="
+                px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium
+                hover:bg-blue-200 active:bg-blue-300 transition-all duration-200 
+                transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+                focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+              "
             >
-              {loading ? 'Завершаю...' : 'Завершить'}
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <span>Завершаю...</span>
+                </div>
+              ) : (
+                'Завершить'
+              )}
             </button>
           )}
           
@@ -248,10 +284,16 @@ export function WishCard({ wish }: WishCardProps) {
             <button
               onClick={() => setShowDisputeModal(true)}
               disabled={loading}
-              className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm hover:bg-orange-200 transition-colors disabled:opacity-50 flex items-center gap-1"
+              className="
+                px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium
+                hover:bg-orange-200 active:bg-orange-300 transition-all duration-200 
+                transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+                focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
+                flex items-center gap-1
+              "
             >
               <AlertTriangle className="w-3 h-3" />
-              Оспорить
+              <span className="hidden sm:inline">Оспорить</span>
             </button>
           )}
         </div>

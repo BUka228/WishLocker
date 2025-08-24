@@ -111,7 +111,6 @@
 
 - [x] 13. Add real-time features and notifications
 
-
   - Implement real-time wallet balance updates using Supabase subscriptions
   - Add live wish status updates and new wish notifications
   - Create real-time friend request notifications
@@ -120,7 +119,8 @@
   - Create notification management and preferences system
   - _Requirements: 2.1, 4.1, 7.2, 8.6, 10.5_
 
-- [ ] 14. Build responsive UI and improve UX
+- [x] 14. Build responsive UI and improve UX
+
 
   - Create responsive design for mobile and desktop devices
   - Implement smooth animations and transitions for better UX

@@ -7,9 +7,10 @@ import { ArrowRight, RefreshCw } from 'lucide-react'
 
 interface CurrencyConverterProps {
   className?: string
+  onSuccess?: () => void
 }
 
-export function CurrencyConverter({ className = '' }: CurrencyConverterProps) {
+export function CurrencyConverter({ className = '', onSuccess }: CurrencyConverterProps) {
   const { wallet, convertCurrency, loading, error } = useWallet()
   const [fromCurrency, setFromCurrency] = useState<CurrencyType>('green')
   const [toCurrency, setToCurrency] = useState<CurrencyType>('blue')
@@ -79,6 +80,7 @@ export function CurrencyConverter({ className = '' }: CurrencyConverterProps) {
           `Успешно конвертировано ${amount} ${WISH_METADATA[fromCurrency].name.toLowerCase()} в ${convertedAmount} ${WISH_METADATA[toCurrency].name.toLowerCase()}`
         )
         setAmount(currentPair?.rate || 10) // Reset to minimum conversion amount
+        onSuccess?.()
       } else {
         setConvertError('Не удалось выполнить конвертацию')
       }
