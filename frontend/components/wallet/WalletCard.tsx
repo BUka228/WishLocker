@@ -1,9 +1,10 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useWallet } from '../../contexts/WalletContext'
 import { WISH_METADATA } from '../../lib/types'
-import { Wallet, RefreshCw } from 'lucide-react'
+import { Wallet, RefreshCw, Gift } from 'lucide-react'
+import { CurrencyGift } from './CurrencyGift'
 
 interface WalletCardProps {
   className?: string
@@ -11,6 +12,7 @@ interface WalletCardProps {
 
 export function WalletCard({ className = '' }: WalletCardProps) {
   const { wallet, loading, refreshWallet, error } = useWallet()
+  const [showGiftModal, setShowGiftModal] = useState(false)
 
   if (loading) {
     return (
@@ -137,13 +139,22 @@ export function WalletCard({ className = '' }: WalletCardProps) {
           <Wallet className="w-5 h-5 text-gray-600" />
           <h2 className="text-lg font-semibold text-gray-800">Мой кошелек</h2>
         </div>
-        <button
-          onClick={refreshWallet}
-          className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          title="Обновить"
-        >
-          <RefreshCw className="w-4 h-4 text-gray-600" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowGiftModal(true)}
+            className="p-2 text-purple-600 hover:bg-purple-50 rounded-full transition-colors"
+            title="Подарить валюту"
+          >
+            <Gift className="w-4 h-4" />
+          </button>
+          <button
+            onClick={refreshWallet}
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            title="Обновить"
+          >
+            <RefreshCw className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -182,6 +193,14 @@ export function WalletCard({ className = '' }: WalletCardProps) {
           Последнее обновление: {new Date(wallet.updated_at).toLocaleString('ru-RU')}
         </div>
       </div>
+
+      <CurrencyGift
+        isOpen={showGiftModal}
+        onClose={() => setShowGiftModal(false)}
+        onSuccess={() => {
+          // Optionally show a success message or refresh data
+        }}
+      />
     </div>
   )
 }

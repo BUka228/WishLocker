@@ -5,6 +5,7 @@ import { WishList } from '@/components/WishList'
 import { QuickActions } from '@/components/QuickActions'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { UserProfile } from '@/components/auth/UserProfile'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { useAuth } from '@/contexts/AuthContext'
 import { useState } from 'react'
 import { User } from 'lucide-react'
@@ -31,6 +32,7 @@ export default function HomePage() {
               <span className="text-gray-700">
                 Привет, <span className="font-semibold">{user.username}</span>!
               </span>
+              <NotificationBell />
               <button
                 onClick={() => setShowProfile(!showProfile)}
                 className="flex items-center gap-1 px-3 py-2 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"

@@ -62,7 +62,6 @@
 
 - [x] 8. Build social friendship system
 
-
   - Create friendship management with pending/accepted/blocked statuses
   - Implement friend request sending and receiving functionality
   - Add SocialProvider context for managing friend relationships
@@ -71,7 +70,8 @@
   - Add self-friendship prevention validation
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
-- [ ] 9. Implement currency gifting system
+- [x] 9. Implement currency gifting system
+
 
   - Create quick currency transfer functionality between friends
   - Add friend selection interface for currency gifting

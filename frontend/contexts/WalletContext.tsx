@@ -203,49 +203,23 @@ export function WalletProvider({ children }: WalletProviderProps) {
     try {
       setError(null)
 
-      // Check if user has enough balance
-      const currentBalance = wallet[`${currency}_balance` as keyof Wallet] as number
-      if (currentBalance < amount) {
-        setError('Недостаточно средств для перевода')
-        return false
-      }
-
-      // Perform transfer using database functions
-      // First, deduct from sender
-      const { data: deductResult, error: deductError } = await supabase.rpc('update_wallet_balance', {
-        p_user_id: user.id,
-        p_currency: currency,
-        p_amount: -amount,
-        p_description: `Перевод ${amount} ${currency} другу`,
-        p_transaction_type: 'spend',
-      })
-
-      if (deductError || !deductResult) {
-        console.error('Transfer deduction error:', deductError)
-        setError('Ошибка списания средств')
-        return false
-      }
-
-      // Then, add to receiver
-      const { data: addResult, error: addError } = await supabase.rpc('update_wallet_balance', {
-        p_user_id: toUserId,
+      // Use the new atomic transfer function
+      const { data: result, error } = await supabase.rpc('transfer_currency_to_friend', {
+        p_sender_id: user.id,
+        p_receiver_id: toUserId,
         p_currency: currency,
         p_amount: amount,
-        p_description: `Получен перевод ${amount} ${currency} от друга`,
-        p_transaction_type: 'earn',
       })
 
-      if (addError || !addResult) {
-        console.error('Transfer addition error:', addError)
-        // Try to rollback the deduction
-        await supabase.rpc('update_wallet_balance', {
-          p_user_id: user.id,
-          p_currency: currency,
-          p_amount: amount,
-          p_description: `Возврат средств после неудачного перевода`,
-          p_transaction_type: 'earn',
-        })
-        setError('Ошибка начисления средств получателю')
+      if (error) {
+        console.error('Currency transfer error:', error)
+        setError('Ошибка перевода валюты')
+        return false
+      }
+
+      if (!result?.success) {
+        const errorMessage = result?.message || 'Не удалось выполнить перевод'
+        setError(errorMessage)
         return false
       }
 

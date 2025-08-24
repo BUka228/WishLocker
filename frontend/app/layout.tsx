@@ -5,6 +5,7 @@ import { WalletProvider } from '../contexts/WalletContext'
 import { SocialProvider } from '../contexts/SocialContext'
 import { WishProvider } from '../contexts/WishContext'
 import { DisputeProvider } from '../contexts/DisputeContext'
+import { NotificationProvider } from '../contexts/NotificationContext'
 import { ToastProvider } from '../components/ui/Toast'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
@@ -28,9 +29,11 @@ export default function RootLayout({
               <SocialProvider>
                 <WishProvider>
                   <DisputeProvider>
-                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-                      {children}
-                    </div>
+                    <NotificationProvider>
+                      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+                        {children}
+                      </div>
+                    </NotificationProvider>
                   </DisputeProvider>
                 </WishProvider>
               </SocialProvider>
