@@ -72,7 +72,6 @@
 
 - [x] 9. Implement currency gifting system
 
-
   - Create quick currency transfer functionality between friends
   - Add friend selection interface for currency gifting
   - Implement balance validation and atomic transfer operations
@@ -81,7 +80,8 @@
   - Implement insufficient funds error handling for transfers
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-- [ ] 10. Build transaction history system
+- [x] 10. Build transaction history system
+
 
   - Create TransactionHistory component displaying chronological transaction list
   - Implement transaction detail display (type, currency, amount, description, date)

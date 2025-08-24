@@ -5,6 +5,7 @@ import { useWallet } from '../../contexts/WalletContext'
 import { WISH_METADATA } from '../../lib/types'
 import { Wallet, RefreshCw, Gift } from 'lucide-react'
 import { CurrencyGift } from './CurrencyGift'
+import { TransactionList } from '../transactions/TransactionList'
 
 interface WalletCardProps {
   className?: string
@@ -192,6 +193,15 @@ export function WalletCard({ className = '' }: WalletCardProps) {
         <div className="text-xs text-gray-500 text-center">
           Последнее обновление: {new Date(wallet.updated_at).toLocaleString('ru-RU')}
         </div>
+      </div>
+
+      <div className="mt-6">
+        <TransactionList 
+          limit={3} 
+          showHeader={true} 
+          showViewAll={true}
+          className="border-0 shadow-none bg-gray-50"
+        />
       </div>
 
       <CurrencyGift

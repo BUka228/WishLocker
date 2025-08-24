@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Gift, Users } from 'lucide-react'
+import { Plus, Gift, Users, Clock } from 'lucide-react'
 import { CurrencyConverter } from './wallet/CurrencyConverter'
 import { WishForm } from './wishes/WishForm'
 
@@ -36,6 +36,14 @@ export function QuickActions() {
             >
               <Users className="w-5 h-5 mr-2" />
               Мои друзья
+            </button>
+            
+            <button 
+              onClick={() => router.push('/transactions')}
+              className="w-full flex items-center justify-center px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              <Clock className="w-5 h-5 mr-2" />
+              История операций
             </button>
           </div>
         </div>
