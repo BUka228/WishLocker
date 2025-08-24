@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Clock, CheckCircle, XCircle, User, Calendar, MessageSquare } from 'lucide-react'
+import { Clock, CheckCircle, XCircle, User, Calendar, MessageSquare, AlertTriangle } from 'lucide-react'
 import { Wish, WISH_METADATA, STATUS_METADATA } from '@/lib/types'
 import { useWish } from '@/contexts/WishContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/components/ui/Toast'
+import { DisputeModal } from '@/components/disputes/DisputeModal'
 
 interface WishCardProps {
   wish: Wish
@@ -12,27 +14,45 @@ interface WishCardProps {
 
 export function WishCard({ wish }: WishCardProps) {
   const [loading, setLoading] = useState(false)
-  const [showDispute, setShowDispute] = useState(false)
-  const [disputeComment, setDisputeComment] = useState('')
+  const [showDisputeModal, setShowDisputeModal] = useState(false)
   
-  const { updateWishStatus, disputeWish } = useWish()
+  const { acceptWish, completeWish } = useWish()
   const { user } = useAuth()
+  const { showToast } = useToast()
 
   const wishMetadata = WISH_METADATA[wish.type]
   const statusMetadata = STATUS_METADATA[wish.status]
 
   const canAccept = user && wish.status === 'active' && wish.creator_id !== user.id
   const canComplete = user && wish.status === 'in_progress' && wish.assignee_id === user.id
-  const canDispute = user && wish.status === 'active' && wish.creator_id !== user.id
+  const canDispute = user && ['active', 'in_progress'].includes(wish.status) && wish.creator_id !== user.id
 
   const handleAccept = async () => {
     if (!user) return
     
     setLoading(true)
     try {
-      await updateWishStatus(wish.id, 'in_progress', user.id)
+      const result = await acceptWish(wish.id)
+      if (result.error) {
+        showToast({
+          type: 'error',
+          title: 'Ошибка при принятии желания',
+          message: result.error
+        })
+      } else {
+        showToast({
+          type: 'success',
+          title: 'Желание принято',
+          message: result.message || 'Желание принято к выполнению!'
+        })
+      }
     } catch (err) {
       console.error('Error accepting wish:', err)
+      showToast({
+        type: 'error',
+        title: 'Ошибка',
+        message: 'Произошла ошибка при принятии желания'
+      })
     } finally {
       setLoading(false)
     }
@@ -43,28 +63,33 @@ export function WishCard({ wish }: WishCardProps) {
     
     setLoading(true)
     try {
-      await updateWishStatus(wish.id, 'completed')
+      const result = await completeWish(wish.id)
+      if (result.error) {
+        showToast({
+          type: 'error',
+          title: 'Ошибка при завершении желания',
+          message: result.error
+        })
+      } else {
+        showToast({
+          type: 'success',
+          title: 'Желание выполнено',
+          message: result.message || 'Желание успешно выполнено!'
+        })
+      }
     } catch (err) {
       console.error('Error completing wish:', err)
+      showToast({
+        type: 'error',
+        title: 'Ошибка',
+        message: 'Произошла ошибка при завершении желания'
+      })
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDispute = async () => {
-    if (!disputeComment.trim()) return
-    
-    setLoading(true)
-    try {
-      await disputeWish(wish.id, disputeComment)
-      setShowDispute(false)
-      setDisputeComment('')
-    } catch (err) {
-      console.error('Error disputing wish:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -107,6 +132,8 @@ export function WishCard({ wish }: WishCardProps) {
         return <CheckCircle className="w-4 h-4 text-green-500" />
       case 'rejected':
         return <XCircle className="w-4 h-4 text-red-500" />
+      case 'disputed':
+        return <AlertTriangle className="w-4 h-4 text-orange-500" />
       default:
         return <Clock className="w-4 h-4 text-gray-500" />
     }
@@ -138,6 +165,7 @@ export function WishCard({ wish }: WishCardProps) {
             wish.status === 'active' ? 'bg-yellow-100 text-yellow-800' :
             wish.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
             wish.status === 'completed' ? 'bg-green-100 text-green-800' :
+            wish.status === 'disputed' ? 'bg-orange-100 text-orange-800' :
             'bg-red-100 text-red-800'
           }`}>
             {getStatusIcon()}
@@ -216,56 +244,25 @@ export function WishCard({ wish }: WishCardProps) {
             </button>
           )}
           
-          {canDispute && !showDispute && (
+          {canDispute && (
             <button
-              onClick={() => setShowDispute(true)}
+              onClick={() => setShowDisputeModal(true)}
               disabled={loading}
-              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm hover:bg-orange-200 transition-colors disabled:opacity-50 flex items-center gap-1"
             >
+              <AlertTriangle className="w-3 h-3" />
               Оспорить
             </button>
           )}
         </div>
       </div>
 
-      {/* Dispute Form */}
-      {showDispute && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-lg border">
-          <div className="flex items-center mb-2">
-            <MessageSquare className="w-4 h-4 text-gray-600 mr-1" />
-            <span className="text-sm font-medium text-gray-700">
-              Оспорить желание
-            </span>
-          </div>
-          <textarea
-            value={disputeComment}
-            onChange={(e) => setDisputeComment(e.target.value)}
-            placeholder="Опишите, что не так с этим желанием или предложите альтернативу..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none"
-            rows={3}
-            disabled={loading}
-          />
-          <div className="flex space-x-2 mt-2">
-            <button
-              onClick={handleDispute}
-              disabled={loading || !disputeComment.trim()}
-              className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Отправляю...' : 'Отправить спор'}
-            </button>
-            <button
-              onClick={() => {
-                setShowDispute(false)
-                setDisputeComment('')
-              }}
-              disabled={loading}
-              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors disabled:opacity-50"
-            >
-              Отмена
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Dispute Modal */}
+      <DisputeModal
+        wish={wish}
+        isOpen={showDisputeModal}
+        onClose={() => setShowDisputeModal(false)}
+      />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 // Shared types for frontend and backend
 
 export type WishType = 'green' | 'blue' | 'red'
-export type WishStatus = 'active' | 'in_progress' | 'completed' | 'rejected'
+export type WishStatus = 'active' | 'in_progress' | 'completed' | 'rejected' | 'disputed'
+export type DisputeStatus = 'pending' | 'accepted' | 'rejected'
 export type TransactionType = 'earn' | 'spend' | 'convert'
 export type CurrencyType = 'green' | 'blue' | 'red'
 
@@ -73,6 +74,23 @@ export interface Friendship {
   friend?: User
 }
 
+export interface Dispute {
+  id: string
+  wish_id: string
+  disputer_id: string
+  comment: string
+  alternative_description?: string | null
+  status: DisputeStatus
+  resolution_comment?: string | null
+  resolved_by?: string | null
+  resolved_at?: string | null
+  created_at: string
+  updated_at: string
+  // Relations
+  disputer?: User
+  wish?: Wish
+}
+
 // API Response types
 export interface ApiResponse<T> {
   data?: T
@@ -123,6 +141,26 @@ export const STATUS_METADATA = {
   },
   completed: {
     name: 'Выполнено',
+    color: 'green',
+  },
+  rejected: {
+    name: 'Отклонено',
+    color: 'red',
+  },
+  disputed: {
+    name: 'Спорное',
+    color: 'orange',
+  },
+} as const
+
+// Dispute status metadata
+export const DISPUTE_STATUS_METADATA = {
+  pending: {
+    name: 'Ожидает',
+    color: 'yellow',
+  },
+  accepted: {
+    name: 'Принято',
     color: 'green',
   },
   rejected: {

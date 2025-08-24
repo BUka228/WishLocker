@@ -17,7 +17,6 @@
 
 - [x] 3. Build wallet management system
 
-
   - Implement WalletProvider context for managing user currency balances
   - Create WalletCard component to display current balances of all three currencies
   - Add real-time wallet balance updates using Supabase subscriptions
@@ -27,11 +26,6 @@
 
 - [x] 4. Develop wish creation and management
 
-
-
-
-
-
   - Create WishForm component with title, description, and type selection
   - Implement wish validation (title ≤100 chars, description ≤500 chars)
   - Add WishProvider context for CRUD operations on wishes
@@ -39,11 +33,7 @@
   - Implement cost assignment based on wish type (1 currency unit per type)
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7_
 
-- [ ] 5. Build wish browsing and filtering system
-
-
-
-
+- [x] 5. Build wish browsing and filtering system
 
   - Create WishList component displaying all available wishes with status indicators
   - Implement wish filtering by type (green/blue/red) and status
@@ -52,7 +42,7 @@
   - Add deadline display functionality for wishes with time limits
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 6. Implement wish execution workflow
+- [x] 6. Implement wish execution workflow
 
   - Create wish acceptance functionality that changes status to "in_progress" and assigns executor
   - Implement wish completion system with balance validation and currency transfer
@@ -61,7 +51,8 @@
   - Add insufficient funds validation and error handling
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-- [ ] 7. Add wish dispute system
+- [x] 7. Add wish dispute system
+
 
   - Create dispute functionality allowing users to challenge wishes with comments
   - Implement dispute notification system for wish creators

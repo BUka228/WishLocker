@@ -25,7 +25,9 @@ interface WishContextType {
   error: string | null
   createWish: (wish: CreateWishRequest) => Promise<ApiResponse<Wish>>
   updateWishStatus: (wishId: string, status: WishStatus, assigneeId?: string) => Promise<ApiResponse<Wish>>
-  disputeWish: (wishId: string, comment: string) => Promise<ApiResponse<void>>
+  acceptWish: (wishId: string) => Promise<ApiResponse<void>>
+  completeWish: (wishId: string) => Promise<ApiResponse<void>>
+  disputeWish: (wishId: string, comment: string, alternativeDescription?: string) => Promise<ApiResponse<void>>
   filterWishes: (filter: WishFilter) => Wish[]
   refreshWishes: () => Promise<void>
 }
@@ -144,40 +146,92 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const updateData: any = { 
-        status, 
-        updated_at: new Date().toISOString() 
-      }
-      
-      if (assigneeId) {
-        updateData.assignee_id = assigneeId
-      }
+      // Handle different status transitions with appropriate database functions
+      if (status === 'in_progress' && assigneeId) {
+        // Use accept_wish function for accepting wishes
+        const { data: functionResult, error: functionError } = await supabase
+          .rpc('accept_wish', {
+            p_wish_id: wishId,
+            p_assignee_id: assigneeId
+          })
 
-      const { data, error: supabaseError } = await supabase
-        .from('wishes')
-        .update(updateData)
-        .eq('id', wishId)
-        .select(`
-          *,
-          creator:users!creator_id(id, username, avatar_url),
-          assignee:users!assignee_id(id, username, avatar_url)
-        `)
-        .single()
+        if (functionError) {
+          throw functionError
+        }
 
-      if (supabaseError) {
-        throw supabaseError
-      }
+        if (!functionResult.success) {
+          return { 
+            error: functionResult.message || 'Не удалось принять желание' 
+          }
+        }
 
-      // Update local state
-      setWishes(prev => 
-        prev.map(wish => 
-          wish.id === wishId ? data as unknown as Wish : wish
+        // Refresh wishes to get updated data
+        await refreshWishes()
+        
+        return { 
+          message: functionResult.message || 'Желание принято к выполнению!' 
+        }
+      } else if (status === 'completed' && assigneeId) {
+        // Use complete_wish function for completing wishes
+        const { data: functionResult, error: functionError } = await supabase
+          .rpc('complete_wish', {
+            p_wish_id: wishId,
+            p_assignee_id: assigneeId
+          })
+
+        if (functionError) {
+          throw functionError
+        }
+
+        if (!functionResult.success) {
+          return { 
+            error: functionResult.message || 'Не удалось завершить желание' 
+          }
+        }
+
+        // Refresh wishes to get updated data
+        await refreshWishes()
+        
+        return { 
+          message: functionResult.message || 'Желание успешно выполнено!' 
+        }
+      } else {
+        // For other status updates, use direct database update
+        const updateData: any = { 
+          status, 
+          updated_at: new Date().toISOString() 
+        }
+        
+        if (assigneeId) {
+          updateData.assignee_id = assigneeId
+        }
+
+        const { data, error: supabaseError } = await supabase
+          .from('wishes')
+          .update(updateData)
+          .eq('id', wishId)
+          .select(`
+            *,
+            creator:users!creator_id(id, username, avatar_url),
+            assignee:users!assignee_id(id, username, avatar_url)
+          `)
+          .single()
+
+        if (supabaseError) {
+          throw supabaseError
+        }
+
+        // Update local state
+        setWishes(prev => 
+          prev.map(wish => 
+            wish.id === wishId ? data as unknown as Wish : wish
+          )
         )
-      )
 
-      return { 
-        data: data as unknown as Wish, 
-        message: 'Статус желания обновлен!' 
+        return { 
+          data: data as unknown as Wish, 
+          message: 'Статус желания обновлен!' 
+        }
       }
     } catch (err) {
       console.error('Error updating wish status:', err)
@@ -187,7 +241,79 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const disputeWish = async (wishId: string, comment: string): Promise<ApiResponse<void>> => {
+  const acceptWish = async (wishId: string): Promise<ApiResponse<void>> => {
+    if (!user) {
+      return { error: 'Необходимо войти в систему' }
+    }
+
+    try {
+      const { data: functionResult, error: functionError } = await supabase
+        .rpc('accept_wish', {
+          p_wish_id: wishId,
+          p_assignee_id: user.id
+        })
+
+      if (functionError) {
+        throw functionError
+      }
+
+      if (!functionResult.success) {
+        return { 
+          error: functionResult.message || 'Не удалось принять желание' 
+        }
+      }
+
+      // Refresh wishes to get updated data
+      await refreshWishes()
+      
+      return { 
+        message: functionResult.message || 'Желание принято к выполнению!' 
+      }
+    } catch (err) {
+      console.error('Error accepting wish:', err)
+      return { 
+        error: 'Не удалось принять желание' 
+      }
+    }
+  }
+
+  const completeWish = async (wishId: string): Promise<ApiResponse<void>> => {
+    if (!user) {
+      return { error: 'Необходимо войти в систему' }
+    }
+
+    try {
+      const { data: functionResult, error: functionError } = await supabase
+        .rpc('complete_wish', {
+          p_wish_id: wishId,
+          p_assignee_id: user.id
+        })
+
+      if (functionError) {
+        throw functionError
+      }
+
+      if (!functionResult.success) {
+        return { 
+          error: functionResult.message || 'Не удалось завершить желание' 
+        }
+      }
+
+      // Refresh wishes to get updated data
+      await refreshWishes()
+      
+      return { 
+        message: functionResult.message || 'Желание успешно выполнено!' 
+      }
+    } catch (err) {
+      console.error('Error completing wish:', err)
+      return { 
+        error: 'Не удалось завершить желание' 
+      }
+    }
+  }
+
+  const disputeWish = async (wishId: string, comment: string, alternativeDescription?: string): Promise<ApiResponse<void>> => {
     if (!user) {
       return { error: 'Необходимо войти в систему' }
     }
@@ -196,13 +322,38 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
       return { error: 'Комментарий к спору обязателен' }
     }
 
+    if (comment.length > 1000) {
+      return { error: 'Комментарий не может быть длиннее 1000 символов' }
+    }
+
+    if (alternativeDescription && alternativeDescription.length > 500) {
+      return { error: 'Альтернативное описание не может быть длиннее 500 символов' }
+    }
+
     try {
-      // For now, we'll just log the dispute
-      // In a full implementation, this would create a dispute record
-      console.log('Dispute created:', { wishId, comment, userId: user.id })
+      const { data: functionResult, error: functionError } = await supabase
+        .rpc('create_dispute', {
+          p_wish_id: wishId,
+          p_disputer_id: user.id,
+          p_comment: comment.trim(),
+          p_alternative_description: alternativeDescription?.trim() || null
+        })
+
+      if (functionError) {
+        throw functionError
+      }
+
+      if (!functionResult.success) {
+        return { 
+          error: functionResult.message || 'Не удалось создать спор' 
+        }
+      }
+
+      // Refresh wishes to get updated status
+      await refreshWishes()
       
       return { 
-        message: 'Спор отправлен создателю желания' 
+        message: functionResult.message || 'Спор отправлен создателю желания' 
       }
     } catch (err) {
       console.error('Error creating dispute:', err)
@@ -227,6 +378,8 @@ export function WishProvider({ children }: { children: React.ReactNode }) {
     error,
     createWish,
     updateWishStatus,
+    acceptWish,
+    completeWish,
     disputeWish,
     filterWishes,
     refreshWishes
